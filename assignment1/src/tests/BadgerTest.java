@@ -1,22 +1,21 @@
 import edu.iastate.coms228.hw1.Badger;
 import edu.iastate.coms228.hw1.Plain;
 import edu.iastate.coms228.hw1.State;
+import edu.iastate.coms228.hw1.Wildlife;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.FileNotFoundException;
 
 import static org.junit.Assert.assertEquals;
 
 public class BadgerTest {
-    Badger b;
-
-    @Before
-    public void setUp() {
-        Plain p = new Plain(3);
-        b = new Badger(p, 0, 0, 0);
-    }
-
     @Test
-    public void whoTest() {
-        assertEquals(b.who(), State.BADGER);
+    public void badgerNextTest() throws FileNotFoundException {
+        Plain oldP = new Plain("badger-test.txt");
+        Plain newP = new Plain(oldP.getWidth());
+        Wildlife.updatePlain(oldP, newP);
+        assertEquals(newP.grid[1][1].who(), State.BADGER);
+        assertEquals(((Badger) newP.grid[1][1]).myAge(), 3);
     }
 }

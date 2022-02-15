@@ -29,24 +29,15 @@ public class Grass extends Living
 	 */
 	public Living next(Plain pNew)
 	{
-		// TODO 
-		// 
-		// See Living.java for an outline of the function. 
-		// See the project description for the survival rules for grass.
+		int[] population = new int[NUM_LIFE_FORMS];
+		census(population);
 
-		Living nextTile;
-
-		int[] censusArray = new int[5];
-		census(censusArray);
-
-		if (censusArray[4] >= censusArray[3] * 3) {
-			nextTile = new Empty(pNew, row, column);
-		} else if (censusArray[4] > 2) {
-			nextTile = new Rabbit(pNew, row, column, 0);
+		if (population[RABBIT] >= population[GRASS] * 3) {
+			return new Empty(pNew, row, column);
+		} else if (population[RABBIT] > 2) {
+			return new Rabbit(pNew, row, column, 0);
 		} else {
-			nextTile = new Grass(pNew, row, column);
+			return new Grass(pNew, row, column);
 		}
-
-		return nextTile;
 	}
 }

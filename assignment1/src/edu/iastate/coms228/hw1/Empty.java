@@ -30,28 +30,19 @@ public class Empty extends Living
 	 */
 	public Living next(Plain pNew)
 	{
-		// TODO 
-		// 
-		// See Living.java for an outline of the function. 
-		// See the project description for corresponding survival rules.
-
-		Living nextTile;
-
-		int[] censusArray = new int[5];
+		int[] censusArray = new int[NUM_LIFE_FORMS];
 		census(censusArray);
 
-		if (censusArray[4] > 1) {
-			nextTile = new Rabbit(pNew, row, column, 0);
-		} else if (censusArray[2] > 1) {
-			nextTile = new Fox(pNew, row, column, 0);
-		} else if (censusArray[0] > 1) {
-			nextTile = new Badger(pNew, row, column, 0);
-		} else if (censusArray[3] > 0) {
-			nextTile = new Grass(pNew, row, column);
+		if (censusArray[RABBIT] > 1) {
+			return new Rabbit(pNew, row, column, 0);
+		} else if (censusArray[FOX] > 1) {
+			return new Fox(pNew, row, column, 0);
+		} else if (censusArray[BADGER] > 1) {
+			return new Badger(pNew, row, column, 0);
+		} else if (censusArray[GRASS] > 0) {
+			return new Grass(pNew, row, column);
 		} else {
-			nextTile = new Empty(pNew, row, column);
+			return new Empty(pNew, row, column);
 		}
-
-		return nextTile;
 	}
 }

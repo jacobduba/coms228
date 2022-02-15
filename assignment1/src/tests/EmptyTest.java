@@ -14,14 +14,4 @@ public class EmptyTest {
         Plain p = new Plain(3);
         e = new Empty(p, 0, 0);
     }
-
-    @Test
-    public void whoTest() {
-        assertEquals(e.who(), State.EMPTY);
-    }
-
-    @Test
-    public void censusTest() {
-
-    }
 }

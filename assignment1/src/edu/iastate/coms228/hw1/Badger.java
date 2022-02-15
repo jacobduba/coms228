@@ -42,26 +42,18 @@ public class Badger extends Animal
 	 */
 	public Living next(Plain pNew)
 	{
-		// TODO 
-		// 
-		// See Living.java for an outline of the function. 
-		// See the project description for the survival rules for a badger.
-		Living nextTile;
-
-		int[] censusArray = new int[5];
-		census(censusArray);
+		int[] population = new int[NUM_LIFE_FORMS];
+		census(population);
 
 		if (age == 4) {
-			nextTile = new Empty(pNew, row, column);
-		} else if (censusArray[0] == 1 && censusArray[2] > 1) {
-			nextTile = new Fox(pNew, row, column, 0);
-		} else if (censusArray[0] + censusArray[2] > censusArray[4]) {
+			return new Empty(pNew, row, column);
+		} else if (population[BADGER] == 1 && population[FOX] > 1) {
+			return new Fox(pNew, row, column, 0);
+		} else if (population[BADGER] + population[FOX] > population[RABBIT]) {
 			// I could've combined this and the age, but I decided to split them up for readability.
-			nextTile = new Empty(pNew, row, column);
+			return new Empty(pNew, row, column);
 		} else {
-			nextTile = new Badger(pNew, row, column, age + 1);
+			return new Badger(pNew, row, column, age + 1);
 		}
-
-		return nextTile;
 	}
 }

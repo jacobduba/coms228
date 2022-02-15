@@ -38,30 +38,32 @@ public abstract class Living
 	 * @param population  counts of all life forms
 	 */
 	protected void census(int population[ ])
-	{		
-		// Count the numbers of Badgers, Empties, Foxes, Grasses, and Rabbits
-		// in the 3x3 neighborhood centered at this Living object.  Store the
-		// counts in the array population[] at indices 0, 1, 2, 3, 4, respectively.
-
-		// Set it ALL to zero!
+	{
+		// Set every value in array to zero.
 		for (int i = 0; i < population.length; i++) {
 			population[i] = 0;
 		}
 
-		// Census every tile around
-		for (int y = Math.max(0, row - 1); y <= Math.min(plain.getWidth() - 1, row + 1); y++) {
-			for (int x = Math.max(0, column - 1); x <= Math.min(plain.getWidth() - 1, column + 1); x++) {
-				Living lifeform = plain.grid[y][x];
-				State stateOfLifeform = lifeform.who();
-				if (stateOfLifeform == State.BADGER) {
+		// So here I want to census every tile around in 9x9 radius
+		// First I find the bounds
+		int lowerYBound = Math.max(0, row - 1);
+		int upperYBound = Math.min(plain.getWidth() - 1, row + 1);
+		int lowerXBound = Math.max(0, column - 1);
+		int upperXBound = Math.min(plain.getWidth() - 1, column + 1);
+
+		// Then visit every tile in the bound.
+		for (int y = lowerYBound; y <= upperYBound; y++) {
+			for (int x = lowerXBound; x <= upperXBound; x++) {
+				State lifeForm = plain.grid[y][x].who();
+				if (lifeForm == State.BADGER) {
 					population[0]++;
-				} else if (stateOfLifeform == State.EMPTY) {
+				} else if (lifeForm == State.EMPTY) {
 					population[1]++;
-				} else if (stateOfLifeform == State.FOX) {
+				} else if (lifeForm == State.FOX) {
 					population[2]++;
-				} else if (stateOfLifeform == State.GRASS) {
+				} else if (lifeForm == State.GRASS) {
 					population[3]++;
-				} else { // Must be a rabbit
+				} else { // lifeForm == STATE.RABBIT
 					population[4]++;
 				}
 			}

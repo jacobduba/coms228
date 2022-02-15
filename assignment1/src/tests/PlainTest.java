@@ -21,4 +21,12 @@ public class PlainTest {
                 "F0 E  G  \n");
         assertEquals(expected, p.toString());
     }
+
+    @Test
+    public void writeTest() throws FileNotFoundException {
+        Plain p = new Plain("public1-3x3.txt");
+        p.write("testing-given-example-1.txt");
+        Plain written = new Plain("testing-given-example-1.txt");
+        assertEquals(p.toString(), written.toString());
+    }
 }

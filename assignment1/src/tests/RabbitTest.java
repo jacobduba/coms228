@@ -1,22 +1,18 @@
-import edu.iastate.coms228.hw1.Plain;
-import edu.iastate.coms228.hw1.Rabbit;
-import edu.iastate.coms228.hw1.State;
+import edu.iastate.coms228.hw1.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.FileNotFoundException;
 
 import static org.junit.Assert.assertEquals;
 
 public class RabbitTest {
-    Rabbit r;
-
-    @Before
-    public void setUp() {
-        Plain p = new Plain(3);
-        r = new Rabbit(p, 0, 0, 0);
-    }
-
     @Test
-    public void whoTest() {
-        assertEquals(r.who(), State.RABBIT);
+    public void rabbitNextTest() throws FileNotFoundException {
+        Plain oldP = new Plain("empty-test.txt");
+        Plain newP = new Plain(oldP.getWidth());
+        Wildlife.updatePlain(oldP, newP);
+        assertEquals(newP.grid[0][1].who(), State.RABBIT);
+        assertEquals(((Rabbit) newP.grid[0][1]).myAge(), 0);
     }
 }

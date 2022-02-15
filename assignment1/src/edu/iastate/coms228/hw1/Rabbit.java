@@ -39,28 +39,19 @@ public class Rabbit extends Animal
 	 */
 	public Living next(Plain pNew)
 	{
-		// TODO 
-		// 
-		// See Living.java for an outline of the function. 
-		// See the project description for the survival rules for a rabbit.
-
-		Living nextTile;
-
-		int[] censusArray = new int[5];
+		int[] censusArray = new int[NUM_LIFE_FORMS];
 		census(censusArray);
 
 		if (age == 3) {
-			nextTile = new Empty(pNew, row, column);
-		} else if (censusArray[4] == 0) {
-			nextTile = new Empty(pNew, row, column);
-		} else if (censusArray[0] + censusArray[2] >= censusArray[4] || censusArray[2] > censusArray[0]) {
-			nextTile = new Fox(pNew, row, column, 0);
+			return new Empty(pNew, row, column);
+		} else if (censusArray[GRASS] == 0) {
+			return new Empty(pNew, row, column);
+		} else if (censusArray[BADGER] + censusArray[FOX] >= censusArray[RABBIT] && censusArray[FOX] > censusArray[BADGER]) {
+			return new Fox(pNew, row, column, 0);
 		} else if (censusArray[0] > censusArray[4]) {
-			nextTile = new Badger(pNew, row, column, 0);
+			return new Badger(pNew, row, column, 0);
 		} else {
-			nextTile = new Rabbit(pNew, row, column, age + 1);
+			return new Rabbit(pNew, row, column, age + 1);
 		}
-
-		return nextTile;
 	}
 }
