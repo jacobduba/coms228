@@ -1,17 +1,19 @@
-import edu.iastate.coms228.hw1.Empty;
-import edu.iastate.coms228.hw1.Plain;
-import edu.iastate.coms228.hw1.State;
+import edu.iastate.coms228.hw1.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.FileNotFoundException;
 
 import static org.junit.Assert.assertEquals;
 
 public class EmptyTest {
-    Empty e;
-
-    @Before
-    public void setUp() {
-        Plain p = new Plain(3);
-        e = new Empty(p, 0, 0);
+    @Test
+    public void emptyNextTest() throws FileNotFoundException {
+        Plain oldP = new Plain("empty-test.txt");
+        Plain newP = new Plain(oldP.getWidth());
+        Wildlife.updatePlain(oldP, newP);
+        assertEquals(newP.grid[0][1].who(), State.RABBIT);
+        assertEquals(((Rabbit) newP.grid[0][1]).myAge(), 0);
     }
+
 }

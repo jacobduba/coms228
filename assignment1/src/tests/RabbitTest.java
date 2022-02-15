@@ -9,10 +9,9 @@ import static org.junit.Assert.assertEquals;
 public class RabbitTest {
     @Test
     public void rabbitNextTest() throws FileNotFoundException {
-        Plain oldP = new Plain("empty-test.txt");
+        Plain oldP = new Plain("rabbit-test.txt");
         Plain newP = new Plain(oldP.getWidth());
         Wildlife.updatePlain(oldP, newP);
-        assertEquals(newP.grid[0][1].who(), State.RABBIT);
-        assertEquals(((Rabbit) newP.grid[0][1]).myAge(), 0);
+        assertEquals(newP.grid[1][1].who(), State.EMPTY);
     }
 }
