@@ -2,12 +2,15 @@ package edu.iastate.cs228.hw2;
 
 /**
  * 
- * @author 
+ * @author Jacob Duba
  *
  */
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.InputMismatchException;
+import java.util.Scanner;
 
 
 /**
@@ -38,7 +41,9 @@ public class PointScanner
 	 */
 	public PointScanner(Point[] pts, Algorithm algo) throws IllegalArgumentException
 	{
-		
+		sortingAlgorithm = algo;
+		// Copy the references, objects can stay the same because we are sorting the pointers.
+		points = Arrays.copyOf(pts, pts.length);
 	}
 
 	
@@ -49,9 +54,28 @@ public class PointScanner
 	 * @throws FileNotFoundException 
 	 * @throws InputMismatchException   if the input file contains an odd number of integers
 	 */
-	protected PointScanner(String inputFileName, Algorithm algo) throws FileNotFoundException, InputMismatchException
-	{
-		// TODO
+	protected PointScanner(String inputFileName, Algorithm algo) throws FileNotFoundException, InputMismatchException {
+		sortingAlgorithm = algo;
+		File file = new File(inputFileName);
+
+		// First we have to find how many points are in the file to initialize the array to the correct size.
+		Scanner scan = new Scanner(file);
+		int count = 0;
+		while (scan.hasNext()) {
+			count++;
+			scan.nextInt();
+		}
+		scan.close();
+		points = new Point[count / 2];
+
+		// Put point into array
+		scan = new Scanner(file);
+		int index = 0;
+		while (scan.hasNext()) {
+			points[index] = new Point(scan.nextInt(), scan.nextInt());
+			index++;
+		}
+		scan.close();
 	}
 
 	
@@ -64,13 +88,11 @@ public class PointScanner
 	 *  
 	 * Based on the value of sortingAlgorithm, create an object of SelectionSorter, InsertionSorter, MergeSorter,
 	 * or QuickSorter to carry out sorting.       
-	 * @param algo
 	 * @return
 	 */
 	public void scan()
 	{
-		// TODO  
-		AbstractSorter aSorter; 
+		AbstractSorter aSorter;
 		
 		// create an object to be referenced by aSorter according to sortingAlgorithm. for each of the two 
 		// rounds of sorting, have aSorter do the following: 
@@ -84,9 +106,34 @@ public class PointScanner
 		//     d) set the medianCoordinatePoint reference to the object with the correct coordinates.
 		//
 		//     e) sum up the times spent on the two sorting rounds and set the instance variable scanTime. 
-		
+
+		aSorter = null;
+		if (sortingAlgorithm == Algorithm.SelectionSort) {
+			aSorter = new SelectionSorter(points);
+		} else if (sortingAlgorithm == Algorithm.InsertionSort) {
+			aSorter = new InsertionSorter(points);
+		} else if (sortingAlgorithm == Algorithm.MergeSort) {
+			aSorter = new MergeSorter(points);
+		} else if (sortingAlgorithm == Algorithm.QuickSort) {
+			aSorter = new QuickSorter(points);
+		}
+
+		aSorter.setComparator(0);
+		long xSortingTime = System.nanoTime();
+		aSorter.sort();
+		xSortingTime = System.nanoTime() - xSortingTime;
+		Point xMedian = aSorter.getMedian();
+
+		aSorter.setComparator(1);
+		long ySortingTime = System.nanoTime();
+		aSorter.sort();
+		ySortingTime = System.nanoTime() - ySortingTime;
+		Point yMedian = aSorter.getMedian();
+
+		medianCoordinatePoint = new Point(xMedian.getX(), yMedian.getY());
+		scanTime = xSortingTime + ySortingTime;
 	}
-	
+
 	
 	/**
 	 * Outputs performance statistics in the format: 
@@ -101,8 +148,7 @@ public class PointScanner
 	 */
 	public String stats()
 	{
-		return null; 
-		// TODO 
+		return String.format("%-13s %8d  %d", sortingAlgorithm, points.length, scanTime);
 	}
 	
 	
@@ -113,8 +159,7 @@ public class PointScanner
 	@Override
 	public String toString()
 	{
-		return null; 
-		// TODO
+		return "MCP: " + medianCoordinatePoint;
 	}
 
 	
@@ -128,8 +173,8 @@ public class PointScanner
 	 */
 	public void writeMCPToFile() throws FileNotFoundException
 	{
-		// TODO 
-	}	
+		// TODO
+	}
 
 	
 

@@ -2,14 +2,13 @@ package edu.iastate.cs228.hw2;
 
 /**
  *  
- * @author
+ * @author Jacob Duba
  *
  */
 
+import java.util.Arrays;
 import java.util.Comparator;
-import java.io.FileNotFoundException;
-import java.lang.IllegalArgumentException; 
-import java.util.InputMismatchException;
+import java.lang.IllegalArgumentException;
 
 /**
  * 
@@ -24,21 +23,17 @@ public abstract class AbstractSorter
 	                             // stores ordered points after a call to sort(). 
 	
 	protected String algorithm = null; // "selection sort", "insertion sort", "mergesort", or
-	                                   // "quicksort". Initialized by a subclass constructor.
-		 
+
 	protected Comparator<Point> pointComparator = null;  
-	
-	
+
 	// Add other protected or private instance variables you may need. 
-	
 
 	protected AbstractSorter()
 	{
 		// No implementation needed. Provides a default super constructor to subclasses. 
 		// Removable after implementing SelectionSorter, InsertionSorter, MergeSorter, and QuickSorter.
 	}
-	
-	
+
 	/**
 	 * This constructor accepts an array of points as input. Copy the points into the array points[]. 
 	 * 
@@ -47,13 +42,11 @@ public abstract class AbstractSorter
 	 */
 	protected AbstractSorter(Point[] pts) throws IllegalArgumentException
 	{
-		// TODO 
-	}
+		if (pts == null || pts.length == 0)
+			throw new IllegalArgumentException();
 
-		
-	
-	
-	
+		points = Arrays.copyOf(pts, pts.length);
+	}
 
 	/**
 	 * Generates a comparator on the fly that compares by x-coordinate if order == 0, by y-coordinate
@@ -70,10 +63,24 @@ public abstract class AbstractSorter
 	 */
 	public void setComparator(int order) throws IllegalArgumentException
 	{
-		// TODO 
-	}
+		if (0 > order || order > 1 ) {
+			throw new IllegalArgumentException();
+		}
 
-	
+		class PointsComparator implements Comparator<Point> {
+			@Override
+			public int compare(Point o1, Point o2) {
+				return o1.compareTo(o2);
+			}
+		}
+		pointComparator = new PointsComparator();
+
+		if (order == 0) {
+			Point.setXorY(true);
+		} else { // Order can only be 1
+			Point.setXorY(false);
+		}
+	}
 
 	/**
 	 * Use the created pointComparator to conduct sorting.  
@@ -81,8 +88,7 @@ public abstract class AbstractSorter
 	 * Should be protected. Made public for testing. 
 	 */
 	public abstract void sort(); 
-	
-	
+
 	/**
 	 * Obtain the point in the array points[] that has median index 
 	 * 
@@ -93,7 +99,6 @@ public abstract class AbstractSorter
 		return points[points.length/2]; 
 	}
 	
-	
 	/**
 	 * Copys the array points[] onto the array pts[]. 
 	 * 
@@ -101,10 +106,11 @@ public abstract class AbstractSorter
 	 */
 	public void getPoints(Point[] pts)
 	{
-		// TODO 
+		for (int i = 0; i < points.length; i++) {
+			pts[i] = new Point(points[i]);
+		}
 	}
 	
-
 	/**
 	 * Swaps the two elements indexed at i and j respectively in the array points[]. 
 	 * 
@@ -113,6 +119,9 @@ public abstract class AbstractSorter
 	 */
 	protected void swap(int i, int j)
 	{
-		// TODO 
-	}	
+		// Just using pointers, so this should be OK
+		Point temp = points[i];
+		points[i] = points[j];
+		points[j] = temp;
+	}
 }

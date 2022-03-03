@@ -2,7 +2,7 @@ package edu.iastate.cs228.hw2;
 
 /**
  *  
- * @author
+ * @author Jacob Duba
  *
  */
 
@@ -15,11 +15,12 @@ package edu.iastate.cs228.hw2;
  */
 
 import java.io.FileNotFoundException;
-import java.util.Scanner; 
-import java.util.Random; 
+import java.util.Random;
+import java.util.Scanner;
 
 
-public class CompareSorters 
+@SuppressWarnings("ALL")
+public class CompareSorters
 {
 	/**
 	 * Repeatedly take integer sequences either randomly generated or read from files. 
@@ -43,7 +44,7 @@ public class CompareSorters
 		//       of the Algorithm type:  SelectionSort, InsertionSort, MergeSort and QuickSort. 
 		// 
 		// 	
-		PointScanner[] scanners = new PointScanner[4]; 
+		PointScanner[] scanners = new PointScanner[3];
 		
 		// For each input of points, do the following. 
 		// 
@@ -55,15 +56,53 @@ public class CompareSorters
 		//     c) After all four scans are done for the input, print out the statistics table from
 		//		  section 2.
 		//
-		// A sample scenario is given in Section 2 of the project description. 
-		
+		// A sample scenario is given in Section 2 of the project description.
+
+		System.out.println("Performances of Four Sorting Algorithms in Point Sorting");
+		System.out.println();
+		System.out.println("keys:  1 (random integers)  2 (file input)  3 (exit)");
+
+		Scanner scan = new Scanner(System.in);
+		int trialNumber = 0;
+		while (trialNumber++ != -1) {
+			System.out.print("Trial " + trialNumber + ": ");
+			int option = scan.nextInt();
+			if (option == 3) {
+				trialNumber = -1; // Stop program
+			} else if (option == 1 || option == 2) {
+				if (option == 1) {
+					System.out.print("Enter number of random points: ");
+					int numPts = scan.nextInt();
+					Point[] pts = generateRandomPoints(numPts, new Random());
+					scanners[0] = new PointScanner(pts, Algorithm.SelectionSort);
+					scanners[1] = new PointScanner(pts, Algorithm.InsertionSort);
+					scanners[2] = new PointScanner(pts, Algorithm.MergeSort);
+				} else {
+					System.out.println("Points from a file");
+					System.out.print("File name: ");
+					String fileName = scan.next();
+					scanners[0] = new PointScanner(fileName, Algorithm.SelectionSort);
+					scanners[1] = new PointScanner(fileName, Algorithm.InsertionSort);
+					scanners[2] = new PointScanner(fileName, Algorithm.MergeSort);
+				}
+
+				System.out.println("\nalgorithm   size  time (ns)");
+				System.out.println("----------------------------------");
+				for (PointScanner s : scanners) {
+					s.scan();
+					System.out.println(s.stats());
+				}
+				System.out.println("----------------------------------\n");
+			}
+		}
+		scan.close();
 	}
 	
 	
 	/**
 	 * This method generates a given number of random points.
 	 * The coordinates of these points are pseudo-random numbers within the range 
-	 * [-50,50] × [-50,50]. Please refer to Section 3 on how such points can be generated.
+	 * [-50,50] ï¿½ [-50,50]. Please refer to Section 3 on how such points can be generated.
 	 * 
 	 * Ought to be private. Made public for testing. 
 	 * 
@@ -72,9 +111,12 @@ public class CompareSorters
 	 * @throws IllegalArgumentException if numPts < 1
 	 */
 	public static Point[] generateRandomPoints(int numPts, Random rand) throws IllegalArgumentException
-	{ 
-		return null; 
-		// TODO 
+	{
+		Point[] p = new Point[numPts];
+		for (int i = 0; i < numPts; i++) {
+			p[i] = new Point(rand.nextInt(101) - 50, rand.nextInt(101) - 50);
+		}
+		return p;
 	}
 	
 }

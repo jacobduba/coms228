@@ -1,14 +1,9 @@
 package edu.iastate.cs228.hw2;
 
-import java.io.FileNotFoundException;
-import java.lang.NumberFormatException; 
-import java.lang.IllegalArgumentException; 
-import java.util.InputMismatchException;
-
 
 /**
  *  
- * @author
+ * @author Jacob Duba
  *
  */
 
@@ -31,7 +26,8 @@ public class QuickSorter extends AbstractSorter
 	 */
 	public QuickSorter(Point[] pts)
 	{
-		// TODO 
+		super(pts);
+		algorithm = "QuickSort";
 	}
 		
 

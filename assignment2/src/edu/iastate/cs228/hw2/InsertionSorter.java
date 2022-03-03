@@ -1,14 +1,9 @@
 package edu.iastate.cs228.hw2;
 
-import java.io.FileNotFoundException;
-import java.lang.NumberFormatException; 
-import java.lang.IllegalArgumentException; 
-import java.util.InputMismatchException;
-
 
 /**
  *  
- * @author
+ * @author Jacob Duba
  *
  */
 
@@ -30,16 +25,24 @@ public class InsertionSorter extends AbstractSorter
 	 */
 	public InsertionSorter(Point[] pts) 
 	{
-		// TODO 
-	}	
+		super(pts);
+		algorithm = "InsertionSorter";
+	}
 
-	
 	/** 
 	 * Perform insertion sort on the array points[] of the parent class AbstractSorter.  
 	 */
 	@Override 
 	public void sort()
 	{
-		// TODO 
-	}		
+		for (int i = 1; i < points.length; i++) {
+			Point temp = points[i];
+			int j = i - 1;
+			while (j > -1 && points[j].compareTo(temp) > 0) {
+				points[j + 1] = points[j];
+				--j;
+			}
+			points[j + 1] = temp;
+		}
+	}
 }

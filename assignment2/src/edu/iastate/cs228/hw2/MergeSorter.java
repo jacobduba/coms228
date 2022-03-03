@@ -1,15 +1,12 @@
 package edu.iastate.cs228.hw2;
 
-import java.io.FileNotFoundException;
-import java.lang.NumberFormatException; 
-import java.lang.IllegalArgumentException; 
-import java.util.InputMismatchException;
-
 /**
  *  
- * @author
+ * @author Jacob Duba
  *
  */
+
+import java.util.Arrays;
 
 /**
  * 
@@ -29,7 +26,8 @@ public class MergeSorter extends AbstractSorter
 	 */
 	public MergeSorter(Point[] pts) 
 	{
-		// TODO  
+		super(pts);
+		algorithm = "MergeSort";
 	}
 
 
@@ -40,7 +38,7 @@ public class MergeSorter extends AbstractSorter
 	@Override 
 	public void sort()
 	{
-		// TODO 
+		mergeSortRec(points);
 	}
 
 	
@@ -53,10 +51,56 @@ public class MergeSorter extends AbstractSorter
 	 */
 	private void mergeSortRec(Point[] pts)
 	{
-		
+		int n = pts.length;
+		if (n == 1) return;
+		int m = n / 2;
+
+		// Merge left side
+		Point[] left = new Point[m];
+		for (int i = 0; i < m; i++) {
+			left[i] = pts[i];
+		}
+		mergeSortRec(left);
+
+		// Merge right side
+		Point[] right = new Point[n - m];
+		for (int i = m; i < n; i++) {
+			right[i - m] = pts[i];
+		}
+		mergeSortRec(right);
+
+		Point[] tmp = merge(left, right);
+		for (int i = 0; i < n; i++) {
+			pts[i] = tmp[i];
+		}
 	}
 
-	
 	// Other private methods if needed ...
 
+	private Point[] merge(Point[] b, Point[] c) {
+		int p = b.length, q = c.length;
+		Point[] d = new Point[p + q];
+		int i = 0, j = 0;
+		while (i < p && j < q) {
+			if (b[i].compareTo(c[j]) <= 0) {
+				d[i + j] = b[i];
+				i++;
+			} else {
+				d[i + j] = c[j];
+				j++;
+			}
+		}
+		if (i >= p) {
+			while (j < q) {
+				d[i + j] = c[j];
+				j++;
+			}
+		} else {
+			while (i < p) {
+				d[i + j] = b[i];
+				i++;
+			}
+		}
+		return d;
+	}
 }
