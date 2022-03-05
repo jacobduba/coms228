@@ -1,5 +1,7 @@
 package edu.iastate.cs228.hw2;
 
+import edu.iastate.cs228.hw2.Algorithm;
+import edu.iastate.cs228.hw2.PointScanner;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;

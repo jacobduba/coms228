@@ -6,8 +6,9 @@ package edu.iastate.cs228.hw2;
  *
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import com.sun.org.apache.xpath.internal.axes.PredicatedNodeTest;
+
+import java.io.*;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -171,9 +172,13 @@ public class PointScanner
 	 * 
 	 * @throws FileNotFoundException
 	 */
-	public void writeMCPToFile() throws FileNotFoundException
-	{
-		// TODO
+	public void writeMCPToFile() {
+		try {
+			File file = new File("outputFileName.txt");
+			FileWriter fw = new FileWriter(file, true);
+			fw.write(toString() + "\n");
+			fw.close();
+		} catch (IOException e) {}
 	}
 
 	

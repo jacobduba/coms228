@@ -1,17 +1,18 @@
 package edu.iastate.cs228.hw2;
 
-import org.junit.Before;
+import edu.iastate.cs228.hw2.Algorithm;
+import edu.iastate.cs228.hw2.PointScanner;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class PointScannerTest {
-    @Before
-    public void setUp() throws Exception {
-
-    }
+    private String path = new File("").getAbsolutePath();
 
     @Test
     public void constructorTest1() throws FileNotFoundException {
@@ -23,6 +24,10 @@ public class PointScannerTest {
     }
 
     @Test
-    public void statsTest() {
+    public void writeMCPtoFileTest() throws FileNotFoundException {
+        // Should be manually checked.
+        PointScanner p = new PointScanner("example1.txt", Algorithm.SelectionSort);
+        p.scan();
+        p.writeMCPToFile();
     }
 }

@@ -31,9 +31,7 @@ public class CompareSorters
 	 **/
 	public static void main(String[] args) throws FileNotFoundException
 	{		
-		// TODO 
-		// 
-		// Conducts multiple rounds of comparison of four sorting algorithms.  Within each round, 
+		// Conducts multiple rounds of comparison of four sorting algorithms.  Within each round,
 		// set up scanning as follows: 
 		// 
 		//    a) If asked to scan random points, calls generateRandomPoints() to initialize an array 
@@ -44,7 +42,7 @@ public class CompareSorters
 		//       of the Algorithm type:  SelectionSort, InsertionSort, MergeSort and QuickSort. 
 		// 
 		// 	
-		PointScanner[] scanners = new PointScanner[3];
+		PointScanner[] scanners = new PointScanner[4];
 		
 		// For each input of points, do the following. 
 		// 
@@ -77,6 +75,7 @@ public class CompareSorters
 					scanners[0] = new PointScanner(pts, Algorithm.SelectionSort);
 					scanners[1] = new PointScanner(pts, Algorithm.InsertionSort);
 					scanners[2] = new PointScanner(pts, Algorithm.MergeSort);
+					scanners[3] = new PointScanner(pts, Algorithm.QuickSort);
 				} else {
 					System.out.println("Points from a file");
 					System.out.print("File name: ");
@@ -84,6 +83,7 @@ public class CompareSorters
 					scanners[0] = new PointScanner(fileName, Algorithm.SelectionSort);
 					scanners[1] = new PointScanner(fileName, Algorithm.InsertionSort);
 					scanners[2] = new PointScanner(fileName, Algorithm.MergeSort);
+					scanners[3] = new PointScanner(fileName, Algorithm.QuickSort);
 				}
 
 				System.out.println("\nalgorithm   size  time (ns)");
