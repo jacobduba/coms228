@@ -27,8 +27,8 @@ public class QuickSort {
 }
 ```
 
-Answer
-
+Answerer the list and perform k adds or
+removes at arbitrary locations:*
 ```java
 int index = -1; // set to -1 because we have no discovered odd.
 
@@ -53,7 +53,7 @@ Answer: $O(n^2)$ When array is made of sorted odd numbers.
 Supposed we wanted to make our sorter generic so that it works for arrays of type T, provided T is comparable.
 
 ```java
-public static <T extends Comparable<? super T> void quickSort(T arr);
+<T extends Comparable<? super T>
 ```
 
 `T extends Comparable<? super T>` means:
@@ -81,51 +81,19 @@ This increments the cursor's index.
 
 `set()` and `remove()` depend on wether `next()` or `previous()` were called:
 if nothing was called after `next()`/`previous()`, you cannot call it a second time.
-
-`set` can be called multiple times as long as next or previous called at some point in the past BUT
-
-`add()` sets direction to NONE!
-
-`next()`
-`add()` 
-`remove()` or `set()`
-
-Exceptions that can be thrown:
-Last exam:
-* `ClassCastException` when the inheritance did not work correctly.
-* `NullPointerException` when you call a method on a object reference that is empty - for Exam 1 that was `startDate.equals()` could throw `NullPointerException` if startDate was no assigned.
-
-For Exam 2:
-* `IllegalStateException` Delete or set when next() or previous() was not called,
-* `NoSuchElementException` if you want to call next() when hasNext() is false.
-* `IndexOutOfBoundsException` If we want to set the iterator
-
-## Question 5
-
-Sorting stability:
-
-If we have duplicate elements, after sorting the duplicate elements remain in the same original order:
-
-```
-Alice   Bob   Cindy   
-```
-
-
-Sort the age in increasing order:
-
-Two sorting orders:
+Role in linux:
 
 ```
 19   20    20    21
 Dan  Ciny 
 ```
 
-fFUKC 
-
-Merlot Omaha 2019
+Merlot Omaha 201er the list and perform k adds or
+removes at arbitrary locations:*9
 Zinfandel Sacramento 2020
 Rose Canberra 2021
-Merlot Austin 2019
+Merlot Austin 201er the list and perform k adds or
+removes at arbitrary locations:*9
 Riesling Detriot 2018
 Rose Aberdeen 2021
 Zinfandel Alanta 2020
