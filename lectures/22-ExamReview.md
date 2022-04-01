@@ -53,7 +53,7 @@ Answer: $O(n^2)$ When array is made of sorted odd numbers.
 Supposed we wanted to make our sorter generic so that it works for arrays of type T, provided T is comparable.
 
 ```java
-<T extends Comparable<? super T>
+<T extends Comparable<? super T>>
 ```
 
 `T extends Comparable<? super T>` means:
