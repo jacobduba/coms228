@@ -12,6 +12,8 @@ import java.util.NoSuchElementException;
  * that store multiple items per node.  Rules for adding and removing
  * elements ensure that each node (except possibly the last one)
  * is at least half full.
+ *
+ * author: Jacob Duba
  */
 public class MultiList<E extends Comparable<? super E>> extends AbstractSequentialList<E> {
     /**
@@ -56,7 +58,6 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
      */
     public MultiList(int nodeSize) {
         if (nodeSize <= 0 || nodeSize % 2 != 0) throw new IllegalArgumentException();
-
         // dummy nodes
         head = new Node();
         tail = new Node();
@@ -87,32 +88,99 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
 
     @Override
     public boolean add(E item) {
-        if (item == null)
-            throw new NullPointerException();
-
-        if (size == 0 || tail.previous.count >= nodeSize) {
-            Node temp = new Node();
-            temp.addItem(item);
-            temp.previous = tail.previous;
-            temp.next = tail;
-            tail.previous.next = temp;
-            tail.previous = temp;
-        } else {
-            tail.previous.addItem(item);
-        }
-        size++;
+        add(size, item);
         return true;
     }
 
     @Override
     public void add(int pos, E item) {
+        if (0 > pos || pos > size) throw new IndexOutOfBoundsException();
         if (item == null) throw new NullPointerException();
+        // if the list is empty, create a new node and put X at offset 0
+        if (size == 0) {
+            Node temp = new Node();
+            temp.addItem(item);
+            link(head, temp);
+        } else {
+            NodeInfo info = find(pos);
+
+            // Chose to use the same variable names as the doc
+            Node n = info.node;
+            int off = info.offset;
+            final int M = nodeSize;
+
+            // otherwise, if off = 0 and if n has a predecessor which has fewer than M elements (and is not the head), put X in n's predecessor
+            if (off == 0 && n.previous != head) {
+                if (n.previous.count < M) {
+                    n.previous.addItem(item);
+                // if n is the tail node and n’s predecessor has M elements, create a new node and put X at offset 0
+                } else if (n.previous.count == M && n == tail) {
+                    Node temp = new Node();
+                    temp.addItem(item);
+                    link(tail.previous, temp);
+                }
+            // otherwise if there is space in node n, put X in node n at offset off, shifting array elements as necessary
+            } else if (n.count < M) {
+                n.addItem(off, item);
+            // otherwise, perform a split operation: move the last M/2 elements of node n into a new successor node n', and then
+            } else {
+                Node temp = new Node();
+                for (int i = M / 2; i < M; i++) {
+                    temp.addItem(n.data[M / 2]); // When you remove, the elements go back,
+                    n.removeItem(M / 2); // so we need to stay in the same place
+                }
+                link(n, temp);
+
+                // if off <= M/2, put X in node n at offset off
+                if (off <= M / 2) {
+                    n.addItem(off, item);
+                // if off > M /2, put X in node n' at offset (off − M /2)
+                } else {
+                    temp.addItem(off - M / 2, item);
+                }
+            }
+        }
+        size++;
     }
 
     @Override
     public E remove(int pos) {
-        // TODO Auto-generated method stub
-        return null;
+        if (0 > pos || pos >= size) throw new IndexOutOfBoundsException();
+        NodeInfo info = find(pos);
+        // Chose to use the same variable names as the doc
+        Node n = info.node;
+        int off = info.offset;
+        final int M = nodeSize;
+
+        E item = n.data[off];
+
+        // if the node n containing X is the last node and has only one element, delete it;
+        if (n.next == tail && n.count == 1) {
+            unlink(n);
+        // otherwise, if n is the last node (thus with two or more elements) , or if n has more than elements, remove X
+            // from n, shifting elements as necessary
+        } else if (n.next == tail || n.count > M / 2) {
+            n.removeItem(off);
+        // otherwise (the node n must have at most M/2 elements), look at its successor n' (note that we
+            // don’t look at the predecessor of n) and perform a merge operation as follows:
+        } else {
+            n.removeItem(off);
+            Node nS = n.next;
+            // if the successor node n' has more than M/2 elements, move the first element from n' to n.
+            if (nS.count > M / 2) {
+                n.addItem(nS.data[0]);
+                nS.removeItem(0);
+            // if the successor node n' has M / 2 or fewer elements, then move all elements from n' to n and
+            // delete n' (full merge)
+            } else {
+                for (int i = 0; i < nS.count; i++) {
+                    n.addItem(nS.data[0]); // When you remove, the elements go back,
+                }
+                unlink(nS);
+            }
+        }
+        size--;
+        return item;
     }
 
     /**
@@ -159,7 +227,7 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
      * the internal structure of the nodes.
      */
     public String toStringInternal() {
-        return toStringInternal(new MultiListIterator());
+        return toStringInternal(null);
     }
 
     /**
@@ -316,13 +384,25 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
     }
 
     private NodeInfo find(int pos) {
-        int offset = 0;
+        int tempPos = 0;
         Node cur = head.next;
-        while (offset + cur.count - 1 < pos) {
-            offset += cur.count;
+        while (cur != tail && tempPos + cur.count - 1 < pos) {
+            tempPos += cur.count;
             cur = cur.next;
         }
-        return new NodeInfo(cur, offset);
+        return new NodeInfo(cur, pos - tempPos);
+    }
+
+    private void link(Node cur, Node newNode) {
+        newNode.previous = cur;
+        newNode.next = cur.next;
+        cur.next.previous = newNode;
+        cur.next = newNode;
+    }
+
+    private void unlink(Node current) {
+        current.previous.next = current.next;
+        current.next.previous = current.previous;
     }
 
     private class MultiListIterator implements ListIterator<E> {
@@ -349,12 +429,12 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
          * @param pos
          */
         public MultiListIterator(int pos) {
-            if (size == 0)
+            if (pos < 0 || pos > size)
                 throw new IndexOutOfBoundsException("" + pos);
             NodeInfo info = find(pos);
             cursor = info.node;
             index = pos;
-            innerIndex = pos - info.offset;
+            innerIndex = info.offset;
             direction = NONE;
         }
 
@@ -366,7 +446,8 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
         @Override
         public E next() {
             if (!hasNext()) throw new NoSuchElementException();
-
+            if (cursor == tail) cursor = head.next; // when you create a list iterator it goes to head.next,
+                                                        // which in an empty list would be the tail.
             E temp = cursor.data[innerIndex];
             index++; innerIndex++;
 
@@ -382,7 +463,17 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
 
         @Override
         public void remove() {
-            // TODO
+            // TODO catch edge cases
+            // TODO I don't think this works when a node gets deleted and/or merged
+            if (direction == NONE) {
+                throw new IllegalStateException();
+            } else if (direction == AHEAD) {
+                MultiList.this.remove(nextIndex());
+            } else if (direction == BEHIND) {
+                MultiList.this.remove(previousIndex());
+                previous();
+            }
+            direction = NONE;
         }
 
         // Other methods you may want to add or override that could possibly facilitate
@@ -442,17 +533,15 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
                 if (0 == innerIndex) {
                     cursor.previous.data[cursor.previous.count - 1] = item;
                 } else {
-                    cursor.data[previousIndex()] = item;
+                    cursor.data[innerIndex - 1] = item;
                 }
             }
         }
 
         @Override
         public void add(E item) {
-            if (size == 0) {
-                Node cur = new Node();
-
-            }
+            MultiList.this.add(index, item);
+            next();
         }
     }
 
