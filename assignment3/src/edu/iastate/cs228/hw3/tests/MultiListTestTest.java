@@ -1,5 +1,6 @@
-package edu.iastate.cs228.hw3;
+package edu.iastate.cs228.hw3.tests;
 
+import edu.iastate.cs228.hw3.MultiList;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -219,9 +220,7 @@ public class MultiListTestTest {
         Assert.assertFalse(listIterator.hasNext());
 
         while(listIterator.hasPrevious()) {
-            System.out.println(list.toStringInternal(listIterator));
-            System.out.println(listIterator.previous());
-            System.out.println(list.toStringInternal(listIterator));
+            listIterator.previous();
             listIterator.remove();
         }
 

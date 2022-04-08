@@ -184,6 +184,30 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
     }
 
     /**
+     * Returns array containing elements of MultiList, while deleting MultiList.
+     * This is for the internal use of sort() and sortReverse().
+     * @return E array
+     */
+    private E[] deleteMultiListAndReturnArray() {
+        E[] items = (E[]) new Comparable[size];
+
+        int i = 0;
+        Node cur = head.next;
+        while (cur != tail) {
+            for (E item : cur.data) {
+                if (item != null) { // The for loops ends up iterating through all parts of an array... even if they're null.
+                    items[i] = item;
+                    i++; size--;
+                }
+            }
+            unlink(cur);
+            cur = cur.next;
+        }
+
+        return items;
+    }
+
+    /**
      * Sort all elements in the Multi list in NON-DECREASING order. You may do the following.
      * Traverse the list and copy its elements into an array, deleting every visited node along
      * the way.  Then, sort the array by calling the insertionSort() method.  (Note that sorting
@@ -194,7 +218,20 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
      * Comparator<E> must have been implemented for calling insertionSort().
      */
     public void sort() {
-        // TODO
+        E[] items = deleteMultiListAndReturnArray();
+
+        class MultiListComparator implements Comparator<E> {
+            @Override
+            public int compare(E o1, E o2) {
+                return o1.compareTo(o2);
+            }
+        }
+
+        insertionSort(items, new MultiListComparator());
+
+        for (E item : items) {
+            add(item);
+        }
     }
 
     /**
@@ -204,7 +241,13 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
      * Comparable<? super E> must be implemented for calling bubbleSort().
      */
     public void sortReverse() {
-        // TODO
+        E[] items = deleteMultiListAndReturnArray();
+
+        bubbleSort(items);
+
+        for (E item : items) {
+            add(item);
+        }
     }
 
     @Override
@@ -383,6 +426,11 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
         }
     }
 
+    /**
+     * Helper method that helps us get the Node a pos is in.
+     * @param pos
+     * @return NodeInfo object containing Node that pos exists in and it's offset.
+     */
     private NodeInfo find(int pos) {
         int tempPos = 0;
         Node cur = head.next;
@@ -393,6 +441,11 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
         return new NodeInfo(cur, pos - tempPos);
     }
 
+    /**
+     * Links a node into a new node.
+     * @param cur node that exists in list
+     * @param newNode new node being inserted into the list
+     */
     private void link(Node cur, Node newNode) {
         newNode.previous = cur;
         newNode.next = cur.next;
@@ -400,6 +453,10 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
         cur.next = newNode;
     }
 
+    /**
+     * Unlinks Node from MultiList
+     * @param current Node that is going to be unlinked.
+     */
     private void unlink(Node current) {
         current.previous.next = current.next;
         current.next.previous = current.previous;
@@ -464,7 +521,6 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
         @Override
         public void remove() {
             // TODO catch edge cases
-            // TODO I don't think this works when a node gets deleted and/or merged
             if (direction == NONE) {
                 throw new IllegalStateException();
             } else if (direction == AHEAD) {
@@ -493,15 +549,12 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
                 throw new NoSuchElementException();
 
 
-            E temp;
             if (0 == innerIndex) {
                 cursor = cursor.previous;
-                innerIndex = cursor.count - 1;
-                temp = cursor.data[innerIndex];
-            } else {
-                temp = cursor.data[--innerIndex];  // The iterator index is before array index.
-                // So it's like A |B, previous needs to return A so you decrement first then get |A B
+                innerIndex = cursor.count;
             }
+            E temp = cursor.data[--innerIndex]; // The iterator index is before array index.
+            // So it's like A |B, previous needs to return A so you decrement first then get |A B
 
             index--;
             direction = AHEAD;
@@ -515,6 +568,8 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
 
         @Override
         public int previousIndex() {
+            if (index - 1 < 0)
+                throw new NoSuchElementException();
             return index - 1;
         }
 
@@ -545,7 +600,6 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
         }
     }
 
-
     /**
      * Sort an array arr[] using the insertion sort algorithm in the NON-DECREASING order.
      *
@@ -553,7 +607,15 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
      * @param comp comparator used in sorting
      */
     private void insertionSort(E[] arr, Comparator<? super E> comp) {
-        // TODO
+        for (int i = 1; i < arr.length; i++) {
+            E temp = arr[i];
+            int j = i - 1;
+            while (j > -1 && comp.compare(arr[j], temp) > 0) {
+                arr[j + 1] = arr[j];
+                --j;
+            }
+            arr[j + 1] = temp;
+        }
     }
 
     /**
@@ -565,6 +627,14 @@ public class MultiList<E extends Comparable<? super E>> extends AbstractSequenti
      * @param arr array holding elements from the list
      */
     private void bubbleSort(E[] arr) {
-        // TODO
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 1; j < arr.length - i; j++) {
+                if (arr[j - 1].compareTo(arr[j]) < 0) {
+                    E temp = arr[j - 1];
+                    arr[j - 1] = arr[j];
+                    arr[j] = temp;
+                }
+            }
+        }
     }
 }

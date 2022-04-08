@@ -1,7 +1,8 @@
-package edu.iastate.cs228.hw3;
+package edu.iastate.cs228.hw3.tests;
 
 
 import com.sun.org.apache.xpath.internal.operations.Mult;
+import edu.iastate.cs228.hw3.MultiList;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,6 +57,7 @@ public class MultiListTest {
         iMl.next();
         iMl.next();
         iMl.set(9);
+        System.out.println(ml.toStringInternal(iMl));
         assertEquals(9, (int) iMl.previous());
         iMl.next();
         iMl.next();
