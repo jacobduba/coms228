@@ -286,7 +286,7 @@ public class VideoStore
 	 * 
 	 * @return
 	 */
-	private String rentedVideosList()
+	public String rentedVideosList()
 	{
 		// TODO 
 		return null; 
@@ -311,7 +311,7 @@ public class VideoStore
 	 * 
 	 * @return
 	 */
-	private String unrentedVideosList()
+	public String unrentedVideosList()
 	{
 		// TODO 
 		return null; 
