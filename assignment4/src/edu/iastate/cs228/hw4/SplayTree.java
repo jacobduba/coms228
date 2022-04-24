@@ -3,6 +3,7 @@ package edu.iastate.cs228.hw4;
 
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Stack;
 
 
@@ -44,7 +45,7 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 */
 	public SplayTree() {
 		size = 0;
-		root = null;
+		setRoot(null);
 	}
 
 
@@ -53,7 +54,7 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 */
 	public SplayTree(E data) {
 		size = 1;
-		root = new Node(data);
+		setRoot(new Node(data));
 	}
 
 
@@ -64,7 +65,8 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @param tree
 	 */
 	public SplayTree(SplayTree<E> tree) {
-		// TODO
+		setRoot(cloneTreeRec(tree.root));
+		size = tree.size();
 	}
 
 
@@ -75,8 +77,16 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @return
 	 */
 	public Node cloneTreeRec(Node subTree) {
-		// TODO
-		return null;
+		if (subTree == null) return null;
+
+		Node copy = new Node(subTree.data);
+		copy.left = cloneTreeRec(subTree.left);
+		copy.right = cloneTreeRec(subTree.right);
+
+		if (copy.left != null) copy.left.parent = copy;
+		if (copy.right != null) copy.right.parent = copy;
+
+		return copy;
 	}
 
 
@@ -86,6 +96,8 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @return element stored at the tree root
 	 */
 	public E getRoot() {
+		if (root == null) return null;
+
 		return root.data;
 	}
 
@@ -101,7 +113,8 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 */
 	@Override
 	public void clear() {
-		root = null;
+		setRoot(null);
+		size = 0;
 	}
 
 
@@ -120,36 +133,23 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * false otherwise (i.e., data is in the tree already)
 	 */
 	public boolean addBST(E data) {
+		Node add = new Node(data);
+
 		// Special case with empty tree; then comparisons cannot be called!
 		if (size == 0) {
-			root = new Node(data);
+			setRoot(add);
 			++size;
 			return true;
 		}
 
-		Node current = root;
-		while (true) {
-			int comp = current.data.compareTo(data);
-			if (comp == 0) {
-				// key is already in tree
-				return false;
-			} else if (comp > 0) {
-				if (current.left != null) {
-					current = current.left;
-				} else {
-					link(current, new Node(data));
-					++size;
-					return true;
-				}
-			} else { // if (comp < 0)
-				if (current.right != null) {
-					current = current.right;
-				} else {
-					link(current, new Node(data));
-					++size;
-					return true;
-				}
-			}
+		Node n = findEntry(data);
+		// key is already in use
+		if (n.data.compareTo(data) == 0) {
+			return false;
+		} else { // key is not in use
+			size++;
+			link(n, add);
+			return true;
 		}
 	}
 
@@ -171,8 +171,26 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 */
 	@Override
 	public boolean add(E data) {
-		// TODO
-		return false;
+		Node add = new Node(data);
+
+		// Special case with empty tree; then comparisons cannot be called, must set root
+		if (size == 0) {
+			setRoot(add);
+			size++;
+			return true;
+		}
+
+		Node n = findEntry(data);
+		// key is already in use
+		if (n.data.compareTo(data) == 0) {
+			splay(n);
+			return false;
+		} else { // key is not in use
+			size++;
+			link(n, add);
+			splay(add);
+			return true;
+		}
 	}
 
 
@@ -185,8 +203,28 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * false otherwise
 	 */
 	public boolean contains(E data) {
-		// TODO
-		return false;
+		if (size == 0) return false;
+
+		Node cur = root;
+		while (true) {
+			int comp = cur.data.compareTo(data);
+			if (comp == 0) {
+				splay(cur);
+				return true;
+			} else if (comp > 0) { // Move to left
+				if (cur.left == null) {
+					splay(cur);
+					return false;
+				}
+				cur = cur.left;
+			} else { // comp < 0 Move to right
+				if (cur.right == null) {
+					splay(cur);
+					return false;
+				}
+				cur = cur.right;
+			}
+		}
 	}
 
 
@@ -212,8 +250,18 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * false if it was not contained in the tree
 	 */
 	public boolean remove(E data) {
-		// TODO
-		return false;
+		if (size == 0) return false;
+
+		Node n = findEntry(data);
+		if (n.data.compareTo(data) == 0) { // if n.data == data
+			unlink(n); // Removal
+			if (n.parent != null) splay(n.parent); // Splay at its parent node after removal
+			return true;
+		} else { // n.data != data,
+			// If the node was not found, the last node encountered on the search path is splayed to the root
+			splay(n);
+			return false;
+		}
 	}
 
 
@@ -230,8 +278,13 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @return element such that element.compareTo(data) == 0
 	 */
 	public E findElement(E data) {
-		// TODO
-		return null;
+		Node entry = findEntry(data);
+		splay(entry);
+		if (entry.data.compareTo(data) == 0) {
+			return findEntry(data).data;
+		} else { // entry.data != data
+			return null;
+		}
 	}
 
 
@@ -246,10 +299,22 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * null  if size == 0.
 	 */
 	public Node findEntry(E data) {
-		// TODO
-		return null;
-	}
+		if (size == 0) return null;
 
+		Node cur = root;
+		while (true) {
+			int comp = cur.data.compareTo(data);
+			if (comp == 0) {
+				return cur;
+			} else if (comp > 0) { // Move to left
+				if (cur.left == null) return cur;
+				cur = cur.left;
+			} else { // comp < 0 Move to right
+				if (cur.right == null) return cur;
+				cur = cur.right;
+			}
+		}
+	}
 
 	/**
 	 * Join the two subtrees T1 and T2 rooted at root1 and root2 into one.  It is
@@ -265,8 +330,16 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @return the root of the joined subtree
 	 */
 	protected Node join(Node root1, Node root2) {
-		// TODO
-		return null;
+		// Find the largest node in T1, which is just the right most.
+		Node x = root1;
+		while (x.right != null) {
+			x = x.right;
+		}
+		// Then splay x to move it to the top
+		splay(x);
+		link(x, root2);
+
+		return x;
 	}
 
 
@@ -277,7 +350,19 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @param current node to splay
 	 */
 	protected void splay(Node current) {
-		// TODO
+		while (current != root) {
+			// If p is the root
+			if (current.parent == root) {
+				zig(current);
+			// If p is not the root and x and p are either both right children or both left children
+			} else if ((current.parent.left == current && current.parent.parent.left == current.parent) ||
+					(current.parent.right == current && current.parent.parent.right == current.parent)) {
+				zigZig(current);
+			// when p is not the root and x is a right child and p is a left child or vice versa
+			} else {
+				zigZag(current);
+			}
+		}
 	}
 
 
@@ -303,12 +388,11 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @param current node to perform the zig-zig operation on
 	 */
 	protected void zigZig(Node current) {
-		// TODO test if this works?
 		if (current.parent.left == current) {
-			rightRotate(current);
+			rightRotate(current.parent);
 			rightRotate(current);
 		} else { // current.parent.right == current
-			leftRotate(current);
+			leftRotate(current.parent);
 			leftRotate(current);
 		}
 	}
@@ -321,7 +405,13 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @param current node to perform the zig-zag operation on
 	 */
 	protected void zigZag(Node current) {
-		// TODO
+		if (current.parent.left == current) {
+			rightRotate(current);
+			leftRotate(current);
+		} else { // current.parent.right == current
+			leftRotate(current);
+			rightRotate(current);
+		}
 	}
 
 
@@ -337,9 +427,16 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 		Node a = current;
 		Node b = current.parent;
 		Node c = current.left;
-		link(b, c);
+
+		if (c == null) {
+			// If C is null, get rid of b.right (which is a), you will get infinite loop otherwise
+			b.right = null;
+		} else {
+			link(b, c);
+
+		}
 		if (b == root) {
-			root = a;
+			setRoot(a);
 		} else {
 			link(b.parent, a);
 		}
@@ -359,9 +456,16 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 		Node a = current;
 		Node b = current.parent;
 		Node c = current.right;
-		link(b, c);
+
+		if (c == null) {
+			// If C is null, get rid of b.left (which is a), you will get infinite loop otherwise
+			b.left = null;
+		} else {
+			link(b, c);
+		}
+
 		if (b == root) {
-			root = a;
+			setRoot(a);
 		} else {
 			link(b.parent, a);
 		}
@@ -396,7 +500,59 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @param n
 	 */
 	private void unlink(Node n) {
-		// TODO
+		// TODO better code?
+
+		// Check if I have two children, splay logic
+		if (n.left != null && n.right != null) {
+			// Here I'm creating a new Splay tree because in order for splay to work
+			// in join() it needs to be a separate subtree.
+			SplayTree<E> subTree = new SplayTree<E>();
+			Node subTreeRoot = cloneTreeRec(n);
+			subTree.setRoot(subTreeRoot);
+
+			subTreeRoot = subTree.join(subTreeRoot.left, subTreeRoot.right);
+
+			if (n == root) {
+				setRoot(subTreeRoot);
+			} else {
+				link(n.parent, subTreeRoot);
+			}
+		} else if (n.right != null) { // and n.left == null
+			if (n == root) {
+				setRoot(n.right);
+			} else {
+				link(n.parent, n.right);
+			}
+		} else if (n.left != null) { // and n.right == null
+			if (n == root) {
+				setRoot(n.left);
+			} else {
+				link(n.parent, n.left);
+			}
+		} else { // if n.left == null && r.right == null
+			if (n == root) {
+				setRoot(null);
+			} else {
+				if (n.parent.left == n) {
+					n.parent.left = null;
+				} else { // if n.parent.right == n
+					n.parent.right = null;
+				}
+			}
+		}
+
+		size--;
+	}
+
+	/**
+	 * Helper method that sets the root, sets root's parent to null.
+	 * This was common enough to create a helper method for.
+	 */
+	private void setRoot(Node n) {
+		root = n;
+		if (n != null) {
+			n.parent = null;
+		}
 	}
 
 
@@ -408,7 +564,34 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @param n
 	 */
 	public void unlinkBST(Node n) {
-		// TODO
+		if (n.left != null && n.right != null) {
+			Node s = successor(n);
+			n.data = s.data;
+			n = s;
+		}
+
+		Node replacement = null;
+		if (n.left != null) {
+			replacement = n.left;
+		} else if (n.right != null) {
+			replacement = n.right;
+		}
+
+		if (n.parent == null) {
+			root = replacement;
+		} else {
+			if (n == n.parent.left) {
+				n.parent.left = replacement;
+			} else {
+				n.parent.right = replacement;
+			}
+		}
+
+		if (replacement != null) {
+			replacement.parent = n.parent;
+		}
+
+		size--;
 	}
 
 
@@ -419,8 +602,26 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 * @return successor of n
 	 */
 	public Node successor(Node n) {
-		// TODO
-		return null;
+		if (n == null) {
+			return null;
+		} else if (n.right != null){
+			// leftmost entry in subtree
+			Node cur = n.right;
+			while (cur.left != null) {
+				cur = cur.left;
+			}
+			return cur;
+		} else {
+			// We need to go up the tree to the closest ancestor that
+			// is a left child; its parent must be the successor
+			Node cur = n.parent;
+			Node child = n;
+			while (cur != null && cur.right == child) {
+				child = cur;
+				cur = cur.parent;
+			}
+			return cur;
+		}
 	}
 
 	@Override
@@ -438,7 +639,7 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	@Override
 	public String toString() {
 		if (root == null) {
-			return "";
+			return "null\n";
 		} else {
 			return toStringRec(root, 0);
 		}
@@ -490,6 +691,8 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 
 		@Override
 		public E next() {
+			if (!hasNext()) throw new NoSuchElementException();
+
 			E ret = s.peek().data;
 			Node temp = s.pop().right;
 
@@ -503,15 +706,21 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 
 		/**
 		 * This method will join the left and right subtrees of the node being removed,
-		 * and then splay at its parent node.  It behaves like the class method
-		 * remove(E data) after the node storing data is found.  Place the cursor at the
-		 * parent (or the new root if removed node was the root).
+		 * It behaves like the class method remove(E data) after the node storing data
+		 * is found.  Place the cursor at the parent (or the new root if removed node was
+		 * the root).
 		 * <p>
 		 * Calls unlinkBST().
 		 */
 		@Override
 		public void remove() {
-			// TODO
+			if (size == 0) {
+				throw new IllegalStateException();
+			} else if (size == 1) {
+				unlinkBST(root);
+			} else {
+				unlinkBST(s.pop());
+			}
 		}
 	}
 }
