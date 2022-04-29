@@ -673,34 +673,43 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 	 */
 	private class SplayTreeIterator implements Iterator<E> {
 		Stack<Node> s;
+		Node current;
+		Node pending;
 
 		public SplayTreeIterator() {
-			s = new Stack<Node>();
-
-			Node cur = root;
-			while (cur != null) {
-				s.push(cur);
-				cur = cur.left;
+			current = root;
+			while (current != null && current.left != null) {
+				current = current.left;
 			}
 		}
 
 		@Override
 		public boolean hasNext() {
-			return s.size() != 0;
+			return current != null;
 		}
+
 
 		@Override
 		public E next() {
 			if (!hasNext()) throw new NoSuchElementException();
 
-			E ret = s.peek().data;
-			Node temp = s.pop().right;
+			pending = current;
+			E ret = current.data;
 
-			while (temp != null) {
-				s.push(temp);
-				temp = temp.left;
+			if (current.right != null) {
+				current = current.right;
+
+				while(current.left != null) {
+					current = current.left;
+				}
+			} else {
+				Node parent = current.parent;
+				while (parent != null && current == parent.right) {
+					current = parent;
+					parent = parent.parent;
+				}
+				current = parent;
 			}
-
 			return ret;
 		}
 
@@ -714,12 +723,11 @@ public class SplayTree<E extends Comparable<? super E>> extends AbstractSet<E> {
 		 */
 		@Override
 		public void remove() {
-			if (size == 0) {
+			if (pending == null) {
 				throw new IllegalStateException();
-			} else if (size == 1) {
-				unlinkBST(root);
 			} else {
-				unlinkBST(s.pop());
+				current = pending.parent;
+				unlinkBST(pending);
 			}
 		}
 	}

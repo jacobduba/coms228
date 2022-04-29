@@ -7,9 +7,6 @@ import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
-/**
- * author: Jacob Duba
- */
 public class SplayTreeTestDooba {
 
 	@Test
@@ -141,7 +138,7 @@ public class SplayTreeTestDooba {
 
 		// Addition is already in array
 		expected = "70\n" +
-		"    50\n" +
+				"    50\n" +
 				"        30\n" +
 				"            10\n" +
 				"                null\n" +
@@ -333,7 +330,7 @@ public class SplayTreeTestDooba {
 				"                null\n" +
 				"                100\n";
 		SplayTree<Integer> splay = new SplayTree<Integer>();
-		splay.remove(30);
+		assertFalse(splay.remove(30));
 		splay.addBST(80);
 		splay.addBST(60);
 		splay.addBST(90);
@@ -633,12 +630,12 @@ public class SplayTreeTestDooba {
 			fail("Should throw NoSuchElementException");
 		}
 
-		// test remove
+		// test remove (fixed by myPeopleNeedMe)
 		String expected = "50\n" +
 				"    30\n" +
-				"        10\n" +
+				"        25\n" +
+				"            10\n" +
 				"            null\n" +
-				"            20\n" +
 				"        35\n" +
 				"            31\n" +
 				"            37\n" +
@@ -652,10 +649,32 @@ public class SplayTreeTestDooba {
 		si.next();
 		si.remove();
 		assertEquals(expected, splay.toString());
+		assertEquals(10, si.next());
+		expected = "53\n" +
+				"    30\n" +
+				"        25\n" +
+				"            10\n" +
+				"            null\n" +
+				"        35\n" +
+				"            31\n" +
+				"            37\n" +
+				"    55\n" +
+				"        null\n" +
+				"        60\n" +
+				"            null\n" +
+				"            62\n";
+		assertEquals(25, si.next());
 		assertEquals(30, si.next());
+		assertEquals(31, si.next());
+		assertEquals(35, si.next());
+		assertEquals(37, si.next());
+		assertEquals(50, si.next());
+		si.remove();
+		assertEquals(expected, splay.toString());
 
 		// Remove when size == 1
 		splay = new SplayTree<Integer>();
+		splay.add(1);
 		si = splay.iterator();
 		try {
 			si.remove();
@@ -665,7 +684,7 @@ public class SplayTreeTestDooba {
 		} catch (Exception e) {
 			fail("Should throw IllegalStateException");
 		}
-		splay.add(1);
+		assertEquals(1, si.next());
 		si.remove();
 
 	}

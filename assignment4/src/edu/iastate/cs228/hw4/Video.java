@@ -20,7 +20,10 @@ public class Video implements Comparable<Video>
 	 */
 	public Video(String film, int n) throws IllegalArgumentException 
 	{
-		// TODO
+		if (n <= 0) throw new IllegalArgumentException();
+		this.film = film;
+		numCopies = n;
+		numRentedCopies = 0;
 	}
 	
 	
@@ -49,7 +52,8 @@ public class Video implements Comparable<Video>
 	 */
 	public void addNumCopies(int n) throws IllegalArgumentException
 	{
-		// TODO  
+		if (n <= 0) throw new IllegalArgumentException();
+		numCopies += n;
 	}
 		
 	public int getNumAvailableCopies()
@@ -74,7 +78,10 @@ public class Video implements Comparable<Video>
 	 */
     public void rentCopies(int n) throws IllegalArgumentException, AllCopiesRentedOutException
     {
-    	// TODO 
+		if (n <= 0) throw new IllegalArgumentException();
+		if (numRentedCopies == numCopies) throw new AllCopiesRentedOutException();
+
+		numRentedCopies = Math.min(n + numRentedCopies, numCopies);
     }
     
     
@@ -86,7 +93,8 @@ public class Video implements Comparable<Video>
      */
     public void returnCopies(int n) throws IllegalArgumentException
     {
-    	// TODO 
+		if (n <= 0) throw new IllegalArgumentException();
+		numRentedCopies = Math.max(numRentedCopies - n, 0);
     }
 	
 
@@ -95,8 +103,7 @@ public class Video implements Comparable<Video>
 	 */
 	public int compareTo(Video vd)
 	{
-		// TODO 
-		return 0;
+		return toString().compareTo(vd.toString());
 	}
 	
 	
@@ -115,7 +122,6 @@ public class Video implements Comparable<Video>
 	@Override 
 	public String toString()
 	{
-		// TODO 
-		return null; 
+		return film + " (" + numCopies + ":" + numRentedCopies + ")";
 	}
 }

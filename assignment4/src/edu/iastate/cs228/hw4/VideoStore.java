@@ -149,7 +149,8 @@ public class VideoStore
      * the message "Film <film> has been rented out".
      * 
      * If there is at least one available copy but n is greater than the number of 
-     * such copies, rent all available copies. In this case, no AllCopiesRentedOutException
+     * such c
+opies, rent all available copies. In this case, no AllCopiesRentedOutException
      * is thrown.  
      * 
      * @param film   
