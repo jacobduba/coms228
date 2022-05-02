@@ -3,6 +3,9 @@ package edu.iastate.cs228.hw4;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * author: Varun (from Discord)
+ */
 public class VideoTestVarun {
 
     @Test

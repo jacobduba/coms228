@@ -7,6 +7,9 @@ import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
+/**
+ * author: Jacob Duba
+ */
 public class SplayTreeTestDooba {
 
 	@Test

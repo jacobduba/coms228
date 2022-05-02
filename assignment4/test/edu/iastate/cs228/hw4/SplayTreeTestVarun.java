@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.util.*;
 
 /**
- * author: Varun
+ * author: Varun (from Discord)
  */
 public class SplayTreeTestVarun {
     private static final int from = 0;
